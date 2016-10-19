@@ -47,3 +47,59 @@ FROM (
 	GROUP BY SEQUENCE.DAY
      ) DQ
 ORDER BY 1;
+
+
+-- Table: d_time
+-- Time dimension
+
+DROP TABLE IF EXISTS d_time CASCADE;
+
+CREATE TABLE d_time
+(
+  id_time time without time zone NOT NULL,
+  time_text character varying,
+  hour integer,
+  quarterhour character varying,
+  minute integer,
+  daytimename character varying,
+  daynight character varying,
+  CONSTRAINT d_time_pkey PRIMARY KEY (id_time)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE d_time
+  OWNER TO postgres;
+
+INSERT INTO d_time
+SELECT  MINUTE as time,
+  to_char(MINUTE, 'hh24:mi') AS TimeOfDay,
+  -- Hour of the day (0 - 23)
+  EXTRACT(HOUR FROM MINUTE) AS HOUR,
+  -- Extract and format quarter hours
+  to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL, 'hh24:mi') ||
+  ' – ' ||
+  to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL + '14 minutes'::INTERVAL, 'hh24:mi')
+    AS QuarterHour,
+  -- Minute of the day (0 - 1439)
+  EXTRACT(HOUR FROM MINUTE)*60 + EXTRACT(MINUTE FROM MINUTE) AS MINUTE,
+  -- Names of day periods
+  CASE WHEN to_char(MINUTE, 'hh24:mi') BETWEEN '06:00' AND '08:29'
+    THEN 'Morning'
+       WHEN to_char(MINUTE, 'hh24:mi') BETWEEN '08:30' AND '11:59'
+    THEN 'AM'
+       WHEN to_char(MINUTE, 'hh24:mi') BETWEEN '12:00' AND '17:59'
+    THEN 'PM'
+       WHEN to_char(MINUTE, 'hh24:mi') BETWEEN '18:00' AND '22:29'
+    THEN 'Evening'
+       ELSE 'Night'
+  END AS DaytimeName,
+  -- Indicator of day or night
+  CASE WHEN to_char(MINUTE, 'hh24:mi') BETWEEN '07:00' AND '19:59' THEN 'Day'
+       ELSE 'Night'
+  END AS DayNight
+FROM (SELECT '0:00'::TIME + (SEQUENCE.MINUTE || ' minutes')::INTERVAL AS MINUTE
+  FROM generate_series(0,1439) AS SEQUENCE(MINUTE)
+  GROUP BY SEQUENCE.MINUTE
+     ) DQ
+ORDER BY 1
