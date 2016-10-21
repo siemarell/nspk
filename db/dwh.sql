@@ -72,7 +72,7 @@ ALTER TABLE d_time
   OWNER TO postgres;
 
 INSERT INTO d_time
-SELECT  MINUTE as time,
+SELECT  (EXTRACT(epoch FROM MINUTE)/60 :: int) as id,
   to_char(MINUTE, 'hh24:mi') AS TimeOfDay,
   -- Hour of the day (0 - 23)
   EXTRACT(HOUR FROM MINUTE) AS HOUR,
@@ -102,4 +102,28 @@ FROM (SELECT '0:00'::TIME + (SEQUENCE.MINUTE || ' minutes')::INTERVAL AS MINUTE
   FROM generate_series(0,1439) AS SEQUENCE(MINUTE)
   GROUP BY SEQUENCE.MINUTE
      ) DQ
-ORDER BY 1
+ORDER BY 1;
+
+
+
+
+------PERMISSIONS-------
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public
+  TO data_read;
+
+GRANT SELECT ,INSERT , UPDATE , DELETE, TRUNCATE, REFERENCES, TRIGGER
+  ON ALL TABLES IN SCHEMA public
+  TO data_etl;
+
+GRANT ALL
+  ON ALL TABLES IN SCHEMA public
+  TO data_root;
+
+GRANT SELECT, UPDATE, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_root, data_etl;
+
+GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_read;
+
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to data_read, data_root, data_etl;

@@ -1,0 +1,8 @@
+{
+  "host": "http://192.168.47.157:9090",
+  "database": "MyBase",
+  "bulk_size": 20,
+  "api_version": "1.0",
+  "pg_conn_string": "host='localhost' dbname='my_database' user='postgres' password='secret'",
+  "tables": ["calendar"]
+}
