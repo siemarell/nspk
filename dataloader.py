@@ -8,7 +8,7 @@ import json
 import requests
 
 from config import config
-
+from data_sources import CsvSource
 
 def extract(d, keys):
     return {key: value for key, value in d.items() if key in keys}
@@ -91,9 +91,6 @@ class DataLoader:
 
                 print('%d rows inserted into %s' % (count, table))
                 rows = []
-
-
-
 
     def _drop_database(self, database):
         print('Drop database "%s"' % database)
@@ -222,38 +219,7 @@ class DataLoader:
         return self.create_attribute_counter
 
 
-class CsvSource:
-    def __init__(self):
-        self.path = config.file_source.path
 
-
-    def get_tables(self):
-        return [table.split('.json')[0] for table in listdir(self.path + '/tables') if table.endswith('.json')]
-
-    def get_schema(self, table):
-        with open('%s/tables/%s.json' % (self.path, table)) as file:
-            return json.load(file)
-
-    def get_data_iterator(self, table):
-        try:
-            file = open('%s/data/%s.csv' % (self.path, table))
-            #reader = csv.reader(file)
-            return SmartIter(file)
-            #return iter(reader)
-        except FileExistsError:
-            return iter(())
-
-class SmartIter:
-    def __init__(self, file):
-        self.file = file
-        self.iterator = iter(csv.reader(self.file))
-
-    def __next__(self):
-        try:
-            return next(self.iterator)
-        except StopIteration:
-            self.file.close()
-        if self.file.closed: raise StopIteration
 
 
 if __name__ == '__main__':
