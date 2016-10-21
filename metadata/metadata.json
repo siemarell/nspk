@@ -1,0 +1,207 @@
+{
+    "cubes": [
+        {
+            "name": "Объем платных услуг населению",
+            "databaseName": "MyBase",
+            "measureGroups": [
+                {
+                    "name": "Uslugi",
+                    "tableName": "fact_uslugi",
+                    "dateColumn": "date",
+                    "measures": [
+                        {
+                            "name": "Объем платных услуг",
+                            "columnName": "value",
+                            "aggregator": "SUM"
+                        }
+                    ],
+                    "dimensionlinks": [
+                        {
+                            "dimensionId": 1,
+                            "factColumnName": "id_territory"
+                        },
+                        {
+                            "dimensionId": 2,
+                            "factColumnName": "id_usluga"
+                        },
+                        {
+                            "dimensionId": 3,
+                            "factColumnName": "date"
+                        },
+                        {
+                            "dimensionId": 6,
+                            "factColumnName": "date"
+                        }
+                    ]
+                },
+                {
+                    "name": "taxes",
+                    "tableName": "fact_taxes",
+                    "dateColumn": "date",
+                    "measures": [
+                        {
+                            "name": "Поступления налогов",
+                            "columnName": "value",
+                            "aggregator": "SUM"
+                        }
+                    ],
+                    "dimensionlinks": [
+                        {
+                            "dimensionId": 1,
+                            "factColumnName": "id_territory"
+                        },
+                        {
+                            "dimensionId": 5,
+                            "factColumnName": "id_taxes_section"
+                        },
+                        {
+                            "dimensionId": 3,
+                            "factColumnName": "date"
+                        },
+                        {
+                            "dimensionId": 6,
+                            "factColumnName": "date"
+                        }
+                    ]
+                },
+                {
+                    "name": "nauka",
+                    "tableName": "fact_nauka",
+                    "dateColumn": "date",
+                    "measures": [
+                        {
+                            "name": "Затраты на исследования",
+                            "columnName": "value",
+                            "aggregator": "SUM"
+                        }
+                    ],
+                    "dimensionlinks": [
+                        {
+                            "dimensionId": 1,
+                            "factColumnName": "id_territory"
+                        },
+                        {
+                            "dimensionId": 3,
+                            "factColumnName": "date"
+                        },
+                        {
+                            "dimensionId": 6,
+                            "factColumnName": "date"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "dimensions": [
+        {
+            "name": "Регион",
+            "databaseName": "MyBase",
+            "tableName": "territory",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Страна",
+                    "columnName": "country"
+                },
+                {
+                    "name": "Федеральный округ",
+                    "columnName": "fed_okrug"
+                },
+                {
+                    "name": "Субьект",
+                    "columnName": "oblast"
+                },
+                {
+                    "name": "hc-code",
+                    "columnName": "hc_code"
+                }
+            ]
+        },
+        {
+            "name": "Тип услуги",
+            "databaseName": "MyBase",
+            "tableName": "d_uslugi",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Услуга",
+                    "columnName": "name"
+                }
+            ]
+        },
+        {
+            "name": "Дата",
+            "databaseName": "MyBase",
+            "tableName": "calendar",
+            "idColumnName": "date",
+            "attributes": [
+                {
+                    "name": "Год",
+                    "columnName": "year"
+                },
+                {
+                    "name": "Полугодие",
+                    "columnName": "halfyear"
+                },
+                {
+                    "name": "Квартал",
+                    "columnName": "quarter"
+                },
+                {
+                    "name": "Месяц",
+                    "columnName": "month",
+                    "orderByColumn": "month_number"
+                },
+                {
+                    "name": "День",
+                    "columnName": "date"
+                }
+            ]
+        },
+        {
+            "name": "Квартал",
+            "databaseName": "MyBase",
+            "tableName": "calendar",
+            "idColumnName": "date",
+            "attributes": [
+                {
+                    "name": "Год",
+                    "columnName": "year"
+                },
+                {
+                    "name": "Полугодие",
+                    "columnName": "halfyear"
+                },
+                {
+                    "name": "Квартал",
+                    "columnName": "quarter"
+                }
+            ]
+        },
+        {
+            "name": "Раздел налоговых поступлений",
+            "databaseName": "MyBase",
+            "tableName": "d_taxes_section",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "НалоговыйРаздел",
+                    "columnName": "name"
+                }
+            ]
+        },
+         {
+            "name": "Время",
+            "databaseName": "MyBase",
+            "tableName": "calendar",
+            "idColumnName": "date",
+            "attributes": [
+                {
+                    "name": "Дата",
+                    "columnName": "date"
+                }
+            ]
+        }
+    ]
+}
