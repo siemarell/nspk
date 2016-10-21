@@ -3,11 +3,12 @@ from os.path import isfile, join, splitext
 from collections import OrderedDict
 from urllib.parse import quote
 
+import csv
 import json
 import requests
 
 from config import config
-
+from data_sources import CsvSource
 
 def extract(d, keys):
     return {key: value for key, value in d.items() if key in keys}
@@ -31,11 +32,6 @@ class DataLoader:
         self.create_link_counter = 0
         self.create_dimension_counter = 0
 
-    def load_data(self, table, dataset):
-        path = build_path('/databases/%s/tables/%s/records', config.database, table)
-        response = requests.post(url=path, headers=config.headers, json={'values': dataset})
-        assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
-        #print('%d rows inserted into %s' % (reader.line_num, table))
 
     def load_metadata(self):
         with open('metadata/metadata.json', encoding='utf-8') as file:
@@ -61,6 +57,78 @@ class DataLoader:
 
                     for link in measure_group['dimensionlinks']:
                         self._create_link(cube_id, mg_id, link)
+
+    def load_data(self, source):
+        database = config.database
+        self._drop_database(database)
+        self._create_database(database)
+        tables = source.get_tables()
+
+        for table in tables:
+            self._create_table(database, source.get_schema(table))
+
+            rows = []
+            run = True
+            count = 0
+
+            path = build_path('/databases/%s/tables/%s/records', database, table)
+            data_iterator = source.get_data_iterator(table)
+
+            print('Load data into table "%s"' % table)
+            while run:
+                for i in range(config.bulk_size):
+                    try:
+                        row = next(data_iterator)
+                        rows.append(row)
+                        count += 1
+                    except StopIteration:
+                        run = False
+                        break
+
+                response = requests.post(url=path, headers=self.headers, json={'values': rows})
+
+                assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
+
+                print('%d rows inserted into %s' % (count, table))
+                rows = []
+
+    def _drop_database(self, database):
+        print('Drop database "%s"' % database)
+
+        path = build_path('/databases/%s', database)
+        response = requests.delete(url=path, headers=self.headers)
+
+        if response.status_code == 200:
+            print('Successfully dropped database "%s"' % database)
+        else:
+            args = (database, response.status_code, response.text)
+            print('Cannot drop database %s: (%d) %s' % args)
+
+    def _create_database(self, database):
+        print('Create database "%s"' % database)
+
+        path = build_path('/databases')
+        response = requests.post(url=path, headers=self.headers, json={"name": database})
+
+        assert response.status_code == 200, 'Cannot create database "%s": %s' % (database, response.text)
+
+        print('Database "%s" successfully created' % database)
+
+    def _create_table(self, database, body):
+        print('Create table "%s"' % body['name'])
+
+        path = build_path('/databases/%s/tables', database)
+        response = requests.post(url=path, headers=self.headers, json=body)
+
+        assert response.status_code == 200, 'Cannot create table "%s": %s' % (body['name'], response.text)
+
+        print('Table "%s" successfully created' % body['name'])
+
+    def _insert_rows(self, table, dataset):
+        path = build_path('/databases/%s/tables/%s/records', config.database, table)
+        response = requests.post(url=path, headers=config.headers, json={'values': dataset})
+        assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
+        # print('%d rows inserted into %s' % (reader.line_num, table))
 
     def _drop_cubes(self):
         self.create_cube_counter = 0
@@ -149,3 +217,16 @@ class DataLoader:
 
         self.create_attribute_counter += 1
         return self.create_attribute_counter
+
+
+
+
+
+if __name__ == '__main__':
+    csvSource = CsvSource()
+    print(sorted(csvSource.get_tables()))
+    print(csvSource.get_schema(csvSource.get_tables()[2]))
+    print(next(csvSource.get_data_iterator('calendar')))
+    itera = csvSource.get_data_iterator('d_uslugi')
+    while True:
+        print(next(itera))

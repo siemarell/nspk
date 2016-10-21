@@ -3,6 +3,12 @@
   "database": "MyBase",
   "bulk_size": 20,
   "api_version": "1.0",
-  "pg_conn_string": "host='localhost' dbname='my_database' user='postgres' password='secret'",
-  "tables": ["calendar"]
+  "file_source": {
+    "path": "file_source"
+  },
+  "pg_source": {
+    "conn_string": "host='192.168.47.54' dbname='data' user='data_read' password='Polymedia10'",
+    "tables": ["calendar"]
+  }
+
 }
