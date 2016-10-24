@@ -1,14 +1,12 @@
-from os import listdir
-from os.path import isfile, join, splitext
+import json
 from collections import OrderedDict
 from urllib.parse import quote
 
-import csv
-import json
 import requests
 
-from config import config
-from data_sources import CsvSource
+from vc_loader.config import config
+from vc_loader.data_sources import CsvSource
+
 
 def extract(d, keys):
     return {key: value for key, value in d.items() if key in keys}

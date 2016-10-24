@@ -1,9 +1,11 @@
-import json
 import csv
-import psycopg2
 import datetime
+import json
 from os import listdir
-from config import config
+
+import psycopg2
+
+from vc_loader.config import config
 
 pg_types = {
     1043: {

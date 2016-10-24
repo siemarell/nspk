@@ -1,5 +1,6 @@
-from dataloader import DataLoader
-from data_sources import CsvSource, PgSource
+from vc_loader.data_sources import CsvSource, PgSource
+from vc_loader.dataloader import DataLoader
+
 
 def load_from_csv():
     dataLoader = DataLoader()
