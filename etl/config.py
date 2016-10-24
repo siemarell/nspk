@@ -1,1 +1,1 @@
-conn_string = "host='192.168.47.54' dbname='data' user='data_etl' password='Polymedia10'"
+conn_string = "postgresql://data_etl:Polymedia10@192.168.47.54:5432/data"
