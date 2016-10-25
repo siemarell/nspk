@@ -18,30 +18,6 @@ DROP TABLE IF EXISTS f_channel_connect CASCADE;
 DROP TABLE IF EXISTS f_serv_incident CASCADE;
 
 
-
-------PERMISSIONS-------
-
-GRANT SELECT ON ALL TABLES IN SCHEMA public
-  TO data_read;
-
-GRANT SELECT ,INSERT , UPDATE , DELETE, TRUNCATE, REFERENCES, TRIGGER
-  ON ALL TABLES IN SCHEMA public
-  TO data_etl;
-
-GRANT ALL
-  ON ALL TABLES IN SCHEMA public
-  TO data_root;
-
-GRANT SELECT, UPDATE, USAGE ON ALL SEQUENCES IN SCHEMA public
-  TO data_root, data_etl;
-
-GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public
-  TO data_read;
-
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to data_read, data_root, data_etl;
-
-
-
 -- Table: calendar
 
 DROP TABLE IF EXISTS calendar CASCADE;
@@ -120,7 +96,7 @@ SELECT  (EXTRACT(epoch FROM MINUTE)/60 :: int) as id,
   EXTRACT(HOUR FROM MINUTE) AS HOUR,
   -- Extract and format quarter hours
   to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL, 'hh24:mi') ||
-  ' – ' ||
+  ' ï¿½ ' ||
   to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL + '14 minutes'::INTERVAL, 'hh24:mi')
     AS QuarterHour,
   -- Minute of the day (0 - 1439)
@@ -496,3 +472,23 @@ CREATE INDEX fki_trigger_serv
 
 
 
+------PERMISSIONS-------
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public
+  TO data_read;
+
+GRANT SELECT ,INSERT , UPDATE , DELETE, TRUNCATE, REFERENCES, TRIGGER
+  ON ALL TABLES IN SCHEMA public
+  TO data_etl;
+
+GRANT ALL
+  ON ALL TABLES IN SCHEMA public
+  TO data_root;
+
+GRANT SELECT, UPDATE, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_root, data_etl;
+
+GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_read;
+
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to data_read, data_root, data_etl;
