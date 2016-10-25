@@ -3,6 +3,7 @@ import etl.config
 from db.db import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import datetime
 
 class Loader:
     def __init__(self):
@@ -17,7 +18,7 @@ class Loader:
 
         self.process_hosts(hosts)
         self.process_triggers(triggers)
-        self.process_fails(fails)
+        self.process_serv_fails(fails)
 
         try:
             self.session.commit()
@@ -26,21 +27,23 @@ class Loader:
             self.session.rollback()
 
 
-    def process_fails(self, fails):
+    def process_serv_fails(self, fails):
         for fail in fails:
             triggerId = fail['triggerid']
 
             trigger = self.session.query(DTrigger).filter(DTrigger.external_id == int(triggerId)).one_or_none()
             host = self.session.query(DHost).filter(DHost.external_id == int(trigger.host_id)).one_or_none()
+            dtime_start = datetime.datetime.fromtimestamp(int(fail['period'][0]))
+            dtime_end = datetime.datetime.fromtimestamp(int(fail['period'][1]))
 
             kwargs = {
                 "d_host": host,
                 "d_trigger": trigger,
-                "id_date_start": '',
-                "id_date_end": '',
-                "id_time_start": '',
-                "id_time_end": '',
-                "fact_timedelta": ''
+                "id_date_start": dtime_start.date(),
+                "id_date_end": dtime_end.date(),
+                "id_time_start": ts(dtime_start.time()),
+                "id_time_end": ts(dtime_end.time()),
+                "fact_timedelta": (dtime_end - dtime_start).seconds
             }
 
             try:
@@ -89,3 +92,27 @@ class Loader:
             except:
                 dbTrigger = DTrigger(**kwargs)
             self.session.add(dbTrigger)
+
+    def process_channel_data(self, json):
+        clients = json['hosts']
+        triggers = json['triggers']
+        fails = json['fails']
+
+        self.process_clients(clients)
+        self.process_channel_fails(fails)
+
+        try:
+            self.session.commit()
+        except Exception as e:
+            print(e)
+            self.session.rollback()
+
+    def process_clients(self, clients):
+        pass
+
+    def process_channel_fails(self, fails):
+        pass
+
+
+def ts(t):
+    return t.hour * 3600 + t.minute * 60 + t.second

@@ -8,7 +8,7 @@
   },
   "pg_source": {
     "conn_string": "host='192.168.47.54' dbname='data' user='data_read' password='Polymedia10'",
-    "tables": ["calendar"]
+    "tables": ["calendar", "d_time","d_host","d_trigger","f_serv_incident"]
   }
 
 }
