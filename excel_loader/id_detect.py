@@ -1,5 +1,3 @@
-
-
 def detectid(table_name, column_name, value, cursor, connection):
 
 
@@ -62,7 +60,7 @@ def detectidtrigger(table_name, column_name, value, cursor, connection, source):
 
 
     cursor.execute("""SELECT "{}".id FROM
-                    public."{}" WHERE "{}" = '{}';""".format(table_name,table_name,column_name,value));
+                    public."{}" WHERE "{}" = '{}';""".format(table_name,table_name,column_name,source));
     dbresponse = cursor.fetchall()
 
     if len(dbresponse) == 0:
@@ -72,7 +70,7 @@ def detectidtrigger(table_name, column_name, value, cursor, connection, source):
             id_cur = 1
         else:
             id_cur = dbresponse[0][0] + 1
-        cursor.execute("""INSERT INTO public."{}"(id, "{}", source_name) VALUES ({},'{}','{}');""".format(table_name,column_name,id_cur, value, source))
+        cursor.execute("""INSERT INTO public."{}"(id, source_name) VALUES ({},'{}');""".format(table_name,id_cur, source))
         connection.commit()
     else:
         id_cur = dbresponse[0][0]
@@ -115,7 +113,7 @@ def detectidhost(table_name, column_name, value, cursor, connection,purpose, div
             id_cur = 1
         else:
             id_cur = dbresponse[0][0] + 1
-        cursor.execute("""INSERT INTO public."{}"(id, name, purpose, division_owner, subsystem, platform_type,os,administrator) VALUES ({},'{}','{}','{}','{}','{}','{}','{}');""".format(table_name,id_cur, value,purpose, division_owner, subsystem, platform_type,os,administrator))
+        cursor.execute("""INSERT INTO public."{}"(id, name, purpose, department_owner, subsystem, platform_type,os,administrator) VALUES ({},'{}','{}','{}','{}','{}','{}','{}');""".format(table_name,id_cur, value,purpose, division_owner, subsystem, platform_type,os,administrator))
         connection.commit()
     else:
         id_cur = dbresponse[0][0]

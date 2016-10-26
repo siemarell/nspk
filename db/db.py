@@ -48,7 +48,7 @@ class DHost(Base):
     id = Column(Integer, primary_key=True, server_default=text("nextval('d_host_id_seq'::regclass)"))
     name = Column(String)
     purpose = Column(Text)
-    division_owner = Column(Text)
+    department_owner = Column(Text)
     subsystem = Column(Text)
     platform_type = Column(Text)
     os = Column(Text)
@@ -86,7 +86,6 @@ class DTrigger(Base):
     __tablename__ = 'd_trigger'
 
     id = Column(Integer, primary_key=True, server_default=text("nextval('d_trigger_id_seq'::regclass)"))
-    name = Column(String)
     source_name = Column(String)
     external_id = Column(Integer)
 
@@ -94,7 +93,7 @@ class DTrigger(Base):
 class FChannelConnect(Base):
     __tablename__ = 'f_channel_connect'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, server_default=text("nextval('f_channel_connect_id_seq'::regclass)"))
     event_start_id = Column(Integer)
     id_date_start = Column(ForeignKey('calendar.date'), index=True)
     id_date_end = Column(ForeignKey('calendar.date'), index=True)

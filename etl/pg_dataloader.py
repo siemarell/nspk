@@ -55,7 +55,6 @@ class Loader:
 
     def _get_trigger(self, triggerJson, id) -> DTrigger:
         kwargs = {
-            "name": triggerJson['description'],
             "source_name": ','.join(triggerJson['subsys']),
             "external_id": id
         }
@@ -72,7 +71,7 @@ class Loader:
         kwargs = {
             "name": hostJson['name'],
             "purpose": hostJson['role'],
-            "division_owner": hostJson['owner.person'],
+            "department_owner": hostJson['owner.person'],
             "subsystem": hostJson['group'],
             "platform_type": hostJson['type'],
             "os": hostJson['os'],
