@@ -18,30 +18,6 @@ DROP TABLE IF EXISTS f_channel_connect CASCADE;
 DROP TABLE IF EXISTS f_serv_incident CASCADE;
 
 
-
-------PERMISSIONS-------
-
-GRANT SELECT ON ALL TABLES IN SCHEMA public
-  TO data_read;
-
-GRANT SELECT ,INSERT , UPDATE , DELETE, TRUNCATE, REFERENCES, TRIGGER
-  ON ALL TABLES IN SCHEMA public
-  TO data_etl;
-
-GRANT ALL
-  ON ALL TABLES IN SCHEMA public
-  TO data_root;
-
-GRANT SELECT, UPDATE, USAGE ON ALL SEQUENCES IN SCHEMA public
-  TO data_root, data_etl;
-
-GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public
-  TO data_read;
-
-GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to data_read, data_root, data_etl;
-
-
-
 -- Table: calendar
 
 DROP TABLE IF EXISTS calendar CASCADE;
@@ -120,7 +96,7 @@ SELECT  (EXTRACT(epoch FROM MINUTE)/60 :: int) as id,
   EXTRACT(HOUR FROM MINUTE) AS HOUR,
   -- Extract and format quarter hours
   to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL, 'hh24:mi') ||
-  ' – ' ||
+  ' ï¿½ ' ||
   to_char(MINUTE - (EXTRACT(MINUTE FROM MINUTE)::INTEGER % 15 || 'minutes')::INTERVAL + '14 minutes'::INTERVAL, 'hh24:mi')
     AS QuarterHour,
   -- Minute of the day (0 - 1439)
@@ -154,7 +130,10 @@ ORDER BY 1;
 CREATE TABLE d_client
 (
   id serial NOT NULL,
-  name text,
+  full_name text,
+  org_name text,
+  address text,
+  router_ip text,
   CONSTRAINT pk_d_client PRIMARY KEY (id)
 )
 WITH (
@@ -162,10 +141,6 @@ WITH (
 );
 ALTER TABLE d_client
   OWNER TO postgres;
-GRANT ALL ON TABLE d_client TO postgres;
-GRANT SELECT ON TABLE d_client TO data_read;
-GRANT ALL ON TABLE d_client TO data_etl;
-GRANT ALL ON TABLE d_client TO data_root;
 -- Table: d_guilty
 
 -- DROP TABLE d_guilty;
@@ -181,10 +156,6 @@ WITH (
 );
 ALTER TABLE d_guilty
   OWNER TO postgres;
-GRANT ALL ON TABLE d_guilty TO postgres;
-GRANT SELECT ON TABLE d_guilty TO data_read;
-GRANT ALL ON TABLE d_guilty TO data_etl;
-GRANT ALL ON TABLE d_guilty TO data_root;
 -- Table: d_host
 
 -- DROP TABLE d_host;
@@ -207,10 +178,6 @@ WITH (
 );
 ALTER TABLE d_host
   OWNER TO postgres;
-GRANT ALL ON TABLE d_host TO postgres;
-GRANT SELECT ON TABLE d_host TO data_read;
-GRANT ALL ON TABLE d_host TO data_etl;
-GRANT ALL ON TABLE d_host TO data_root;
 -- Table: d_provider
 
 -- DROP TABLE d_provider;
@@ -226,10 +193,6 @@ WITH (
 );
 ALTER TABLE d_provider
   OWNER TO postgres;
-GRANT ALL ON TABLE d_provider TO postgres;
-GRANT SELECT ON TABLE d_provider TO data_read;
-GRANT ALL ON TABLE d_provider TO data_etl;
-GRANT ALL ON TABLE d_provider TO data_root;
 -- Table: d_rfc
 
 -- DROP TABLE d_rfc;
@@ -245,10 +208,6 @@ WITH (
 );
 ALTER TABLE d_rfc
   OWNER TO postgres;
-GRANT ALL ON TABLE d_rfc TO postgres;
-GRANT SELECT ON TABLE d_rfc TO data_read;
-GRANT ALL ON TABLE d_rfc TO data_etl;
-GRANT ALL ON TABLE d_rfc TO data_root;
 -- Table: d_trigger
 
 -- DROP TABLE d_trigger;
@@ -266,10 +225,6 @@ WITH (
 );
 ALTER TABLE d_trigger
   OWNER TO postgres;
-GRANT ALL ON TABLE d_trigger TO postgres;
-GRANT SELECT ON TABLE d_trigger TO data_read;
-GRANT ALL ON TABLE d_trigger TO data_etl;
-GRANT ALL ON TABLE d_trigger TO data_root;
 -- Table: f_channel_connect
 
 -- DROP TABLE f_channel_connect;
@@ -279,14 +234,15 @@ CREATE TABLE f_channel_connect
   id integer NOT NULL,
   id_date_start date,
   id_date_end date,
+  id_time_start integer,
+  id_time_end integer,
   id_client integer,
   id_provider integer,
   id_rfc integer,
   id_guilty integer,
   fact_timedelta integer,
   fact_sla integer,
-  id_time_start integer,
-  id_time_end integer,
+
   CONSTRAINT pk_fact_id PRIMARY KEY (id),
   CONSTRAINT fk_id_client_d_client FOREIGN KEY (id_client)
       REFERENCES d_client (id) MATCH SIMPLE
@@ -297,15 +253,15 @@ CREATE TABLE f_channel_connect
   CONSTRAINT fk_id_date_start_calendar FOREIGN KEY (id_date_start)
       REFERENCES calendar (date) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_id_guilty_d_guilty FOREIGN KEY (id_guilty)
-      REFERENCES d_guilty (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+ -- CONSTRAINT fk_id_guilty_d_guilty FOREIGN KEY (id_guilty)
+ --     REFERENCES d_guilty (id) MATCH SIMPLE
+ --     ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_id_provider_d_provider FOREIGN KEY (id_provider)
       REFERENCES d_provider (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT fk_id_rfc_d_rfc FOREIGN KEY (id_rfc)
-      REFERENCES d_rfc (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+ -- CONSTRAINT fk_id_rfc_d_rfc FOREIGN KEY (id_rfc)
+ --     REFERENCES d_rfc (id) MATCH SIMPLE
+ --     ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_time_end_time FOREIGN KEY (id_time_end)
       REFERENCES d_time (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -318,10 +274,6 @@ WITH (
 );
 ALTER TABLE f_channel_connect
   OWNER TO postgres;
-GRANT ALL ON TABLE f_channel_connect TO postgres;
-GRANT SELECT ON TABLE f_channel_connect TO data_read;
-GRANT ALL ON TABLE f_channel_connect TO data_etl;
-GRANT ALL ON TABLE f_channel_connect TO data_root;
 
 -- Index: fki_date_start_calendar
 
@@ -405,10 +357,11 @@ CREATE TABLE f_serv_incident
   id_host integer,
   id_date_start date,
   id_date_end date,
-  id_trigger integer,
-  fact_timedelta integer,
   id_time_start integer,
   id_time_end integer,
+  id_trigger integer,
+  fact_timedelta integer,
+  description text,
   CONSTRAINT f_serv_incident_pkey PRIMARY KEY (id),
   CONSTRAINT date_end FOREIGN KEY (id_date_end)
       REFERENCES calendar (date) MATCH SIMPLE
@@ -434,10 +387,6 @@ WITH (
 );
 ALTER TABLE f_serv_incident
   OWNER TO postgres;
-GRANT ALL ON TABLE f_serv_incident TO postgres;
-GRANT SELECT ON TABLE f_serv_incident TO data_read;
-GRANT ALL ON TABLE f_serv_incident TO data_etl;
-GRANT ALL ON TABLE f_serv_incident TO data_root;
 
 -- Index: fki_date_end_serv
 
@@ -496,3 +445,23 @@ CREATE INDEX fki_trigger_serv
 
 
 
+------PERMISSIONS-------
+
+GRANT SELECT ON ALL TABLES IN SCHEMA public
+  TO data_read;
+
+GRANT SELECT ,INSERT , UPDATE , DELETE, TRUNCATE, REFERENCES, TRIGGER
+  ON ALL TABLES IN SCHEMA public
+  TO data_etl;
+
+GRANT ALL
+  ON ALL TABLES IN SCHEMA public
+  TO data_root;
+
+GRANT SELECT, UPDATE, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_root, data_etl;
+
+GRANT SELECT, USAGE ON ALL SEQUENCES IN SCHEMA public
+  TO data_read;
+
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public to data_read, data_root, data_etl;

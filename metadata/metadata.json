@@ -1,137 +1,98 @@
 {
     "cubes": [
         {
-            "name": "Объем платных услуг населению",
+            "name": "Мониторинг серверов",
             "databaseName": "MyBase",
             "measureGroups": [
                 {
-                    "name": "Uslugi",
-                    "tableName": "fact_uslugi",
-                    "dateColumn": "date",
+                    "name": "Инциденты серверов",
+                    "tableName": "f_serv_incident",
+                    "dateColumn": "id_date_start",
                     "measures": [
                         {
-                            "name": "Объем платных услуг",
-                            "columnName": "value",
+                            "name": "Количество инцидентов",
+                            "columnName": "fact_timedelta",
+                            "aggregator": "COUNT"
+                        },{
+                            "name": "Длительность инцидентов",
+                            "columnName": "fact_timedelta",
                             "aggregator": "SUM"
                         }
+
                     ],
                     "dimensionlinks": [
                         {
                             "dimensionId": 1,
-                            "factColumnName": "id_territory"
+                            "factColumnName": "id_date_start"
                         },
                         {
                             "dimensionId": 2,
-                            "factColumnName": "id_usluga"
+                            "factColumnName": "id_date_start"
                         },
                         {
                             "dimensionId": 3,
-                            "factColumnName": "date"
+                            "factColumnName": "id_time_start"
                         },
                         {
-                            "dimensionId": 6,
-                            "factColumnName": "date"
-                        }
-                    ]
-                },
-                {
-                    "name": "taxes",
-                    "tableName": "fact_taxes",
-                    "dateColumn": "date",
-                    "measures": [
-                        {
-                            "name": "Поступления налогов",
-                            "columnName": "value",
-                            "aggregator": "SUM"
-                        }
-                    ],
-                    "dimensionlinks": [
-                        {
-                            "dimensionId": 1,
-                            "factColumnName": "id_territory"
+                            "dimensionId": 4,
+                            "factColumnName": "id_host"
                         },
                         {
                             "dimensionId": 5,
-                            "factColumnName": "id_taxes_section"
-                        },
-                        {
-                            "dimensionId": 3,
-                            "factColumnName": "date"
-                        },
-                        {
-                            "dimensionId": 6,
-                            "factColumnName": "date"
+                            "factColumnName": "id_trigger"
                         }
                     ]
-                },
+                }
+            ]
+        },{
+            "name": "Мониторинг каналов",
+            "databaseName": "MyBase",
+            "measureGroups": [
                 {
-                    "name": "nauka",
-                    "tableName": "fact_nauka",
-                    "dateColumn": "date",
+                    "name": "Мониторинг каналов",
+                    "tableName": "f_channel_connect",
+                    "dateColumn": "id_date_start",
                     "measures": [
                         {
-                            "name": "Затраты на исследования",
-                            "columnName": "value",
+                            "name": "Количество инцидентов",
+                            "columnName": "fact_timedelta",
+                            "aggregator": "COUNT"
+                        },{
+                            "name": "Длительность инцидентов",
+                            "columnName": "fact_timedelta",
+                            "aggregator": "SUM"
+                        },                        {
+                            "name": "Количество инцидентов SLA",
+                            "columnName": "fact_sla",
+                            "aggregator": "COUNT"
+                        },{
+                            "name": "Длительность инцидентов SLA",
+                            "columnName": "fact_sla",
                             "aggregator": "SUM"
                         }
+
                     ],
                     "dimensionlinks": [
-                        {
-                            "dimensionId": 1,
-                            "factColumnName": "id_territory"
-                        },
-                        {
-                            "dimensionId": 3,
-                            "factColumnName": "date"
-                        },
-                        {
-                            "dimensionId": 6,
-                            "factColumnName": "date"
-                        }
+
                     ]
                 }
             ]
         }
     ],
     "dimensions": [
-        {
-            "name": "Регион",
-            "databaseName": "MyBase",
-            "tableName": "territory",
-            "idColumnName": "id",
-            "attributes": [
-                {
-                    "name": "Страна",
-                    "columnName": "country"
-                },
-                {
-                    "name": "Федеральный округ",
-                    "columnName": "fed_okrug"
-                },
-                {
-                    "name": "Субьект",
-                    "columnName": "oblast"
-                },
-                {
-                    "name": "hc-code",
-                    "columnName": "hc_code"
-                }
-            ]
-        },
-        {
-            "name": "Тип услуги",
-            "databaseName": "MyBase",
-            "tableName": "d_uslugi",
-            "idColumnName": "id",
-            "attributes": [
-                {
-                    "name": "Услуга",
-                    "columnName": "name"
-                }
-            ]
-        },
-        {
+         {
             "name": "Дата",
+            "databaseName": "MyBase",
+            "tableName": "calendar",
+            "idColumnName": "date",
+            "attributes": [
+                {
+                    "name": "Дата",
+                    "columnName": "date"
+                }
+            ]
+        },{
+            "name": "Календарь",
             "databaseName": "MyBase",
             "tableName": "calendar",
             "idColumnName": "date",
@@ -158,48 +119,56 @@
                     "columnName": "date"
                 }
             ]
-        },
-        {
-            "name": "Квартал",
+        },{
+            "name": "Время",
             "databaseName": "MyBase",
-            "tableName": "calendar",
-            "idColumnName": "date",
-            "attributes": [
-                {
-                    "name": "Год",
-                    "columnName": "year"
-                },
-                {
-                    "name": "Полугодие",
-                    "columnName": "halfyear"
-                },
-                {
-                    "name": "Квартал",
-                    "columnName": "quarter"
-                }
-            ]
-        },
-        {
-            "name": "Раздел налоговых поступлений",
-            "databaseName": "MyBase",
-            "tableName": "d_taxes_section",
+            "tableName": "d_time",
             "idColumnName": "id",
             "attributes": [
                 {
-                    "name": "НалоговыйРаздел",
-                    "columnName": "name"
+                    "name": "Время",
+                    "columnName": "time_text",
+                    "orderBy": "id"
                 }
             ]
-        },
-         {
-            "name": "Время",
+        },{
+            "name": "Хосты",
             "databaseName": "MyBase",
-            "tableName": "calendar",
-            "idColumnName": "date",
+            "tableName": "d_host",
+            "idColumnName": "id",
             "attributes": [
                 {
-                    "name": "Дата",
-                    "columnName": "date"
+                    "name": "Имя",
+                    "columnName": "name"
+                },{
+                    "name": "Назначение",
+                    "columnName": "purpose"
+                },{
+                    "name": "Подразделение-владелец",
+                    "columnName": "division_owner"
+                },{
+                    "name": "Тип аппаратной платформы",
+                    "columnName": "platform_type"
+                },{
+                    "name": "Операционная система",
+                    "columnName": "os"
+                },{
+                    "name": "Администратор",
+                    "columnName": "administrator"
+                }
+            ]
+        },{
+            "name": "Триггеры",
+            "databaseName": "MyBase",
+            "tableName": "d_trigger",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Имя",
+                    "columnName": "name"
+                },{
+                    "name": "Подсистема",
+                    "columnName": "source_name"
                 }
             ]
         }

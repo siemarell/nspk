@@ -10,5 +10,5 @@ class obj(object):
 
 config = obj({})
 
-with open('config.json', encoding='utf-8') as file:
+with open('vc_loader/config.json', encoding='utf-8') as file:
     config = obj(json.load(file))

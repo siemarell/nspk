@@ -9,7 +9,7 @@ def load_from_csv():
 
 def load_from_pg():
     dataLoader = DataLoader()
-    #dataLoader.load_metadata()
+    dataLoader.load_metadata()
     dataLoader.load_data(PgSource())
 
 
