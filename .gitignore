@@ -2,6 +2,8 @@
 .idea/
 /file_source
 __pycache__/
-report001.json
+test_data/
 test.py
 /venv
+/etl/config.py
+/vc_loader/config.json

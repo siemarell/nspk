@@ -4,6 +4,7 @@ from db.db import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import datetime
+import json
 
 class Loader:
     def __init__(self):
@@ -16,9 +17,35 @@ class Loader:
         triggers = json['triggers']
         fails = json['fails']
 
-        self.process_hosts(hosts)
-        self.process_triggers(triggers)
-        self.process_serv_fails(fails)
+        for fail in fails:
+            triggerId = fail['triggerid']
+            hostId = triggers[triggerId]['hostid']
+            failId = fail['events']['begin']
+            trigger = self._get_trigger(triggers[triggerId], int(triggerId))
+            host = self._get_host(hosts[hostId], int(hostId))
+
+            dtime_start = datetime.datetime.fromtimestamp(int(fail['period'][0]))
+            dtime_end = datetime.datetime.fromtimestamp(int(fail['period'][1]))
+
+            kwargs = {
+                "d_host": host,
+                "event_start_id": failId,
+                "d_trigger": trigger,
+                "id_date_start": dtime_start.date(),
+                "id_date_end": dtime_end.date(),
+                "id_time_start": tm(dtime_start.time()),
+                "id_time_end": tm(dtime_end.time()),
+                "fact_timedelta": (dtime_end - dtime_start).seconds,
+                "description": triggers[triggerId]['description']
+            }
+            dbFail = self.session.query(FServIncident).filter(FServIncident.event_start_id == int(failId)).one_or_none()
+            if dbFail:
+                id = dbFail.id
+                kwargs['id'] = id
+                dbFail = self.session.merge(FServIncident(**kwargs))
+            else:
+                dbFail = FServIncident(**kwargs)
+            self.session.add(dbFail)
 
         try:
             self.session.commit()
@@ -26,93 +53,120 @@ class Loader:
             print(e)
             self.session.rollback()
 
+    def _get_trigger(self, triggerJson, id) -> DTrigger:
+        kwargs = {
+            "name": triggerJson['description'],
+            "source_name": ','.join(triggerJson['subsys']),
+            "external_id": id
+        }
+        trigger = self.session.query(DTrigger).filter(DTrigger.external_id == id).one_or_none()
+        if trigger:
+            id = trigger.id
+            kwargs['id'] = id
+            trigger = self.session.merge(DTrigger(**kwargs))
+        else:
+            trigger = DTrigger(**kwargs)
+        return trigger
 
-    def process_serv_fails(self, fails):
-        for fail in fails:
-            triggerId = fail['triggerid']
-
-            trigger = self.session.query(DTrigger).filter(DTrigger.external_id == int(triggerId)).one_or_none()
-            host = self.session.query(DHost).filter(DHost.external_id == int(trigger.host_id)).one_or_none()
-            dtime_start = datetime.datetime.fromtimestamp(int(fail['period'][0]))
-            dtime_end = datetime.datetime.fromtimestamp(int(fail['period'][1]))
-
-            kwargs = {
-                "d_host": host,
-                "d_trigger": trigger,
-                "id_date_start": dtime_start.date(),
-                "id_date_end": dtime_end.date(),
-                "id_time_start": ts(dtime_start.time()),
-                "id_time_end": ts(dtime_end.time()),
-                "fact_timedelta": (dtime_end - dtime_start).seconds
-            }
-
-            try:
-                id = self.session.query(FServIncident).filter(FServIncident.external_id == int(fail.id)).one_or_none().id
-                kwargs['id'] = id
-                dbFail = self.session.merge(FServIncident(**kwargs))
-            except:
-                dbFail = FServIncident(**kwargs)
-            self.session.add(dbFail)
+    def _get_host(self, hostJson, id) -> DHost:
+        kwargs = {
+            "name": hostJson['name'],
+            "purpose": hostJson['role'],
+            "division_owner": hostJson['owner.person'],
+            "subsystem": hostJson['group'],
+            "platform_type": hostJson['type'],
+            "os": hostJson['os'],
+            "administrator": hostJson['owner.person'],
+            "external_id": id
+        }
+        host = self.session.query(DHost).filter(DHost.external_id == id).one_or_none()
+        if host:
+            id = host.id
+            kwargs['id'] = id
+            host = self.session.merge(DHost(**kwargs))
+        else:
+            host = DHost(**kwargs)
+        return host
 
 
-    def process_hosts(self, hosts):
-        for hostId, host in hosts.items():
-            # Find host and update or create a new one
-            kwargs = {
-                "name":host['name'],
-                "purpose":host['role'],
-                "division_owner":host['owner.person'],
-                "subsystem":'',
-                "platform_type":host['type'],
-                "os":host['os'],
-                "administrator":host['owner.person'],
-                "external_id":int(hostId)
-            }
-            try:
-                id = self.session.query(DHost).filter(DHost.external_id == int(hostId)).one_or_none().id
-                kwargs['id'] = id
-                dbHost = self.session.merge(DHost(**kwargs))
-            except:
-                dbHost = DHost(**kwargs)
-            self.session.add(dbHost)
-                
-
-    def process_triggers(self, triggers):
-        for triggerId, trigger in triggers.items():
-            # Find trigger and update or create a new one
-            kwargs = {
-                "name":trigger['description'],
-                "source_name": ','.join(trigger['role']),
-                "external_id":int(triggerId)
-            }
-            try:
-                id = self.session.query(DTrigger).filter(DTrigger.external_id == int(triggerId)).one_or_none().id
-                kwargs['id'] = id
-                dbTrigger = self.session.merge(DTrigger(**kwargs))
-            except:
-                dbTrigger = DTrigger(**kwargs)
-            self.session.add(dbTrigger)
 
     def process_channel_data(self, json):
         clients = json['hosts']
         triggers = json['triggers']
         fails = json['fails']
 
-        self.process_clients(clients)
-        self.process_channel_fails(fails)
+        for fail in fails:
+            triggerId = fail['triggerid']
+            clientId = triggers[triggerId]['hostid']
+            failId = fail['events']['begin']
+            #trigger = self.make_trigger(triggers[triggerId], int(triggerId))
+            client = self._get_client(clients[clientId], int(clientId))
+            provider = self._get_provider(clients[clientId])
 
+            dtime_start = datetime.datetime.fromtimestamp(int(fail['period'][0]))
+            dtime_end = datetime.datetime.fromtimestamp(int(fail['period'][1]))
+            timedelta = (dtime_end - dtime_start).seconds
+            sla = timedelta if timedelta > 3600 *4 else 0
+
+            kwargs = {
+                "d_client": client,
+                "d_provider": provider,
+                "event_start_id": failId,
+                "id_date_start": dtime_start.date(),
+                "id_date_end": dtime_end.date(),
+                "id_time_start": tm(dtime_start.time()),
+                "id_time_end": tm(dtime_end.time()),
+                "fact_timedelta": timedelta,
+                "fact_sla": sla
+            }
+            dbFail = self.session.query(FChannelConnect).filter(FChannelConnect.event_start_id == int(failId)).one_or_none()
+            if dbFail:
+                id = dbFail.id
+                kwargs['id'] = id
+                dbFail = self.session.merge(FChannelConnect(**kwargs))
+            else:
+                dbFail = FChannelConnect(**kwargs)
+            self.session.add(dbFail)
         try:
             self.session.commit()
         except Exception as e:
             print(e)
             self.session.rollback()
 
-    def process_clients(self, clients):
-        pass
+    def _get_client(self, clientJson, id) -> DClient:
+        kwargs = {
+            "full_name": clientJson['name'],
+            "org_name": clientJson['org'],
+            "address": clientJson['addr'],
+            "router_ip": clientJson['routerip'],
+            "provider": clientJson['prov'],
+            "external_id": id
+        }
+        client = self.session.query(DClient).filter(DClient.external_id == id).one_or_none()
+        if client:
+            id = client.id
+            kwargs['id'] = id
+            client = self.session.merge(DClient(**kwargs))
+        else:
+            client = DClient(**kwargs)
+        return client
 
-    def process_channel_fails(self, fails):
-        pass
+    def _get_provider(self, client) -> DProvider:
+        provider = self.session.query(DProvider).filter(DProvider.name == client['prov']).one_or_none()
+        if provider:
+            return provider
+        else:
+            return DProvider(name=client['prov'])
 
 
-def ts(t):
-    return t.hour * 3600 + t.minute * 60 + t.second
+def tm(t):
+    return t.hour * 60 + t.minute
+
+if __name__ == '__main__':
+    loader = Loader()
+    file1 = open('../test_data/report001.json')
+    json1 = json.load(file1)
+    loader.process_server_data(json1)
+    file2 = open('../test_data/ak.json')
+    json2 = json.load(file2)
+    loader.process_channel_data(json2)

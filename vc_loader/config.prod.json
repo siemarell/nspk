@@ -1,0 +1,14 @@
+{
+  "host": "http://localhost:9090",
+  "database": "MyBase",
+  "bulk_size": 20,
+  "api_version": "1.0",
+  "file_source": {
+    "path": "file_source"
+  },
+  "pg_source": {
+    "conn_string": "host='localhost' dbname='myBase' user='user' password='password'",
+    "tables": ["calendar", "d_time","d_host","d_trigger","f_serv_incident"]
+  }
+
+}
