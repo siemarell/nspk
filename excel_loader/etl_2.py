@@ -4,7 +4,7 @@ import id_detect as id
 
 df = pd.ExcelFile("D:\\PROJECTS\\PYTHON_PROJECTS\\NSPK\\dataForLoad2.xlsx")
 sheet = df.parse(0)
-dbname = 'data'
+dbname = 'test'
 connection = psycopg2.connect(""" dbname = {} user = postgres host = 192.168.47.54 password = Polymedia10""".format(dbname))
 cursor = connection.cursor()
 
@@ -84,7 +84,7 @@ for row in sheet.iterrows():
 #    id_os = id.detectid('d_os','name',val_os,cursor,connection)
 #    id_divisionOwner = id.detectiddivisionowner('d_division_owner','name',val_divisionOwner,cursor,connection,val_department)
 #    id_administrator = id.detectid('d_administrator','name',val_administrator,cursor,connection)
-    id_trigger = id.detectidtrigger('d_trigger','name',val_trigger,cursor,connection, val_source)
+    id_trigger = id.detectidtrigger('d_trigger','source_name',val_trigger,cursor,connection, val_source)
 #    id_period = id.detectid('d_period_type','name',val_period,cursor,connection)
 #    id_platform_type = id.detectid('d_platform_type','name',val_platformType,cursor,connection)
     id_time_start = id.detectidtime('d_time','id',val_time_start,cursor,connection)
@@ -94,17 +94,20 @@ for row in sheet.iterrows():
 
 
 
-    cursor.execute(''' INSERT INTO public."f_serv_incident"(id, id_host, id_date_start,
- id_date_end, id_trigger, fact_timedelta,
- id_time_start, id_time_end) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);''',(
+    cursor.execute(''' INSERT INTO public."f_serv_incident"(id, name, event_start_id, id_host,
+ id_date_start, id_date_end, id_time_start, id_time_end, id_trigger,
+ fact_timedelta, description) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);''',(
     id_fact,
+    val_source,
+    None,
     id_host,
     val_date_start,
     val_date_end,
-    id_trigger,
-    val_downtime,
     id_time_start,
     id_time_close,
+    id_trigger,
+    val_downtime,
+    None,
     ))
     connection.commit()
     id_fact+=1

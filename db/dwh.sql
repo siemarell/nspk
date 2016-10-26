@@ -167,7 +167,7 @@ CREATE TABLE d_host
   id serial NOT NULL,
   name character varying,
   purpose text,
-  division_owner text,
+  department_owner text,
   subsystem text,
   platform_type text,
   os text,
@@ -217,7 +217,7 @@ ALTER TABLE d_rfc
 CREATE TABLE d_trigger
 (
   id serial NOT NULL,
-  name character varying,
+
   source_name character varying,
   external_id integer,
   CONSTRAINT d_trigger_pkey PRIMARY KEY (id)
@@ -357,6 +357,7 @@ CREATE INDEX fki_time_start_time
 CREATE TABLE f_serv_incident
 (
   id serial NOT NULL,
+  name character varying,
   event_start_id INTEGER,
   id_host integer,
   id_date_start date,
