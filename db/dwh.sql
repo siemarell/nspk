@@ -134,6 +134,8 @@ CREATE TABLE d_client
   org_name text,
   address text,
   router_ip text,
+  provider text,
+  external_id INTEGER,
   CONSTRAINT pk_d_client PRIMARY KEY (id)
 )
 WITH (
@@ -231,7 +233,8 @@ ALTER TABLE d_trigger
 
 CREATE TABLE f_channel_connect
 (
-  id integer NOT NULL,
+  id serial NOT NULL,
+  event_start_id INTEGER,
   id_date_start date,
   id_date_end date,
   id_time_start integer,
@@ -354,6 +357,7 @@ CREATE INDEX fki_time_start_time
 CREATE TABLE f_serv_incident
 (
   id serial NOT NULL,
+  event_start_id INTEGER,
   id_host integer,
   id_date_start date,
   id_date_end date,

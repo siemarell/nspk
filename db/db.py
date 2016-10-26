@@ -27,7 +27,12 @@ class DClient(Base):
     __tablename__ = 'd_client'
 
     id = Column(Integer, primary_key=True, server_default=text("nextval('d_client_id_seq'::regclass)"))
-    name = Column(Text)
+    full_name = Column(Text)
+    org_name = Column(Text)
+    address = Column(Text)
+    router_ip = Column(Text)
+    provider = Column(Text)
+    external_id = Column(Integer)
 
 
 class DGuilty(Base):
@@ -90,23 +95,22 @@ class FChannelConnect(Base):
     __tablename__ = 'f_channel_connect'
 
     id = Column(Integer, primary_key=True)
+    event_start_id = Column(Integer)
     id_date_start = Column(ForeignKey('calendar.date'), index=True)
     id_date_end = Column(ForeignKey('calendar.date'), index=True)
-    id_client = Column(ForeignKey('d_client.id'), index=True)
-    id_provider = Column(ForeignKey('d_provider.id'), index=True)
-    id_rfc = Column(ForeignKey('d_rfc.id'), index=True)
-    id_guilty = Column(ForeignKey('d_guilty.id'), index=True)
-    fact_timedelta = Column(Integer)
-    fact_sla = Column(Integer)
     id_time_start = Column(ForeignKey('d_time.id'), index=True)
     id_time_end = Column(ForeignKey('d_time.id'), index=True)
+    id_client = Column(ForeignKey('d_client.id'), index=True)
+    id_provider = Column(ForeignKey('d_provider.id'), index=True)
+    id_rfc = Column(Integer, index=True)
+    id_guilty = Column(Integer, index=True)
+    fact_timedelta = Column(Integer)
+    fact_sla = Column(Integer)
 
     d_client = relationship('DClient')
     calendar = relationship('Calendar', primaryjoin='FChannelConnect.id_date_end == Calendar.date')
     calendar1 = relationship('Calendar', primaryjoin='FChannelConnect.id_date_start == Calendar.date')
-    d_guilty = relationship('DGuilty')
     d_provider = relationship('DProvider')
-    d_rfc = relationship('DRfc')
     d_time = relationship('DTime', primaryjoin='FChannelConnect.id_time_end == DTime.id')
     d_time1 = relationship('DTime', primaryjoin='FChannelConnect.id_time_start == DTime.id')
 
@@ -115,13 +119,15 @@ class FServIncident(Base):
     __tablename__ = 'f_serv_incident'
 
     id = Column(Integer, primary_key=True, server_default=text("nextval('f_serv_incident_id_seq'::regclass)"))
+    event_start_id = Column(Integer)
     id_host = Column(ForeignKey('d_host.id'), index=True)
     id_date_start = Column(ForeignKey('calendar.date'), index=True)
     id_date_end = Column(ForeignKey('calendar.date'), index=True)
-    id_trigger = Column(ForeignKey('d_trigger.id'), index=True)
-    fact_timedelta = Column(Integer)
     id_time_start = Column(ForeignKey('d_time.id'), index=True)
     id_time_end = Column(ForeignKey('d_time.id'), index=True)
+    id_trigger = Column(ForeignKey('d_trigger.id'), index=True)
+    fact_timedelta = Column(Integer)
+    description = Column(Text)
 
     calendar = relationship('Calendar', primaryjoin='FServIncident.id_date_end == Calendar.date')
     calendar1 = relationship('Calendar', primaryjoin='FServIncident.id_date_start == Calendar.date')
