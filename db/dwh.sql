@@ -232,6 +232,7 @@ ALTER TABLE d_trigger
 CREATE TABLE f_channel_connect
 (
   id integer NOT NULL,
+  event_start_id INTEGER,
   id_date_start date,
   id_date_end date,
   id_time_start integer,
@@ -354,6 +355,7 @@ CREATE INDEX fki_time_start_time
 CREATE TABLE f_serv_incident
 (
   id serial NOT NULL,
+  event_start_id INTEGER,
   id_host integer,
   id_date_start date,
   id_date_end date,
