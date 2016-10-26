@@ -4,7 +4,7 @@ import id_detect as id
 
 df = pd.ExcelFile("D:\\PROJECTS\\PYTHON_PROJECTS\\NSPK\\dataForLoadCopy.xlsx")
 sheet = df.parse(0)
-dbname = 'data'
+dbname = 'test'
 connection = psycopg2.connect(""" dbname = {} user = postgres host = 192.168.47.54 password = Polymedia10""".format(dbname))
 cursor = connection.cursor()
 
@@ -56,7 +56,7 @@ for row in sheet.iterrows():
 
 
 
-    id_client = id.detectid('d_client','name',val_client,cursor,connection)
+    id_client = id.detectid('d_client','full_name',val_client,cursor,connection)
     id_provider = id.detectid('d_provider','name',val_provider,cursor,connection)
     id_rfc = id.detectid('d_rfc','name',val_rfc,cursor,connection)
     id_guilty = id.detectid('d_guilty','name',val_guilty,cursor,connection)
