@@ -49,7 +49,6 @@ class EtlProcessor:
 
         try:
             self.session.commit()
-            print('Successful commit')
             return True
         except Exception as e:
             print(e)
