@@ -1,5 +1,5 @@
 from vc_loader.data_sources import CsvSource, PgSource
-from vc_loader.dataloader import DataLoader
+from vc_loader.vicube_loader import DataLoader
 
 
 def load_from_csv():

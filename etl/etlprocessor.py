@@ -6,13 +6,13 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 import json
 
-class Loader:
+class EtlProcessor:
     def __init__(self):
         self._engine = create_engine(etl.config.conn_string)
         self._Session = sessionmaker(bind=self._engine)
         self.session = self._Session()
         
-    def process_server_data(self, json):
+    def process_server_data(self, json) -> bool:
         hosts = json['hosts']
         triggers = json['triggers']
         fails = json['fails']
@@ -49,9 +49,12 @@ class Loader:
 
         try:
             self.session.commit()
+            print('Successful commit')
+            return True
         except Exception as e:
             print(e)
             self.session.rollback()
+            return False
 
     def _get_trigger(self, triggerJson, id) -> DTrigger:
         kwargs = {
@@ -87,9 +90,7 @@ class Loader:
             host = DHost(**kwargs)
         return host
 
-
-
-    def process_channel_data(self, json):
+    def process_channel_data(self, json) -> bool:
         clients = json['hosts']
         triggers = json['triggers']
         fails = json['fails']
@@ -115,6 +116,8 @@ class Loader:
                 "id_date_end": dtime_end.date(),
                 "id_time_start": tm(dtime_start.time()),
                 "id_time_end": tm(dtime_end.time()),
+                "id_rfc": 0,
+                "id_guilty": 0,
                 "fact_timedelta": timedelta,
                 "fact_sla": sla
             }
@@ -128,9 +131,11 @@ class Loader:
             self.session.add(dbFail)
         try:
             self.session.commit()
+            return True
         except Exception as e:
             print(e)
             self.session.rollback()
+            return False
 
     def _get_client(self, clientJson, id) -> DClient:
         kwargs = {
@@ -162,10 +167,10 @@ def tm(t):
     return t.hour * 60 + t.minute
 
 if __name__ == '__main__':
-    loader = Loader()
+    loader = EtlProcessor()
     file1 = open('../test_data/report001.json')
     json1 = json.load(file1)
     loader.process_server_data(json1)
-    file2 = open('../test_data/ak.json')
-    json2 = json.load(file2)
-    loader.process_channel_data(json2)
+    #file2 = open('../test_data/ak.json')
+    #json2 = json.load(file2)
+    #loader.process_channel_data(json2)

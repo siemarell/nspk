@@ -1,5 +1,5 @@
 {
-  "host": "http://192.168.47.157:9090",
+  "host": "http://192.168.47.54:8880",
   "database": "MyBase",
   "bulk_size": 20,
   "api_version": "1.0",
@@ -8,7 +8,16 @@
   },
   "pg_source": {
     "conn_string": "host='192.168.47.54' dbname='data' user='data_read' password='Polymedia10'",
-    "tables": ["calendar", "d_time","d_host","d_trigger","f_serv_incident"]
+    "tables": [
+      "calendar",
+      "d_time",
+      "d_host",
+      "d_trigger",
+      "f_serv_incident",
+      "d_provider",
+      "d_client",
+      "f_channel_connect"
+    ]
   }
 
 }
