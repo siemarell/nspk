@@ -1,7 +1,7 @@
 from queue import Queue
 from threading import Thread
 import time
-from updater import Updater
+from update import *
 
 class DataWorker(Thread):
     def __init__(self):
@@ -17,13 +17,13 @@ class DataWorker(Thread):
             if not self.queue.empty():
                 data = self.queue.get()
                 print('Trying to update dwh')
-                if Updater.update_dwh(data):
+                if update_dwh(data):
                     print('Success')
                     data_changed=True
                 else: print('Failure')
             else:
                 if data_changed:
-                    if Updater.update_vicube():
+                    if update_vicube():
                         print('Success')
                     else: print('Failure')
                     data_changed = False
