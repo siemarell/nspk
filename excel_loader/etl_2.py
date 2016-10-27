@@ -4,7 +4,7 @@ import id_detect as id
 
 df = pd.ExcelFile("D:\\PROJECTS\\PYTHON_PROJECTS\\NSPK\\dataForLoad2.xlsx")
 sheet = df.parse(0)
-dbname = 'test'
+dbname = 'data'
 connection = psycopg2.connect(""" dbname = {} user = postgres host = 192.168.47.54 password = Polymedia10""".format(dbname))
 cursor = connection.cursor()
 
@@ -94,11 +94,10 @@ for row in sheet.iterrows():
 
 
 
-    cursor.execute(''' INSERT INTO public."f_serv_incident"(id, name, event_start_id, id_host,
+    cursor.execute(''' INSERT INTO public."f_serv_incident"(id, event_start_id, id_host,
  id_date_start, id_date_end, id_time_start, id_time_end, id_trigger,
- fact_timedelta, description) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);''',(
+ fact_timedelta, description) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);''',(
     id_fact,
-    val_source,
     None,
     id_host,
     val_date_start,

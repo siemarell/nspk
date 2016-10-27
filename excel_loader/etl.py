@@ -4,7 +4,7 @@ import id_detect as id
 
 df = pd.ExcelFile("D:\\PROJECTS\\PYTHON_PROJECTS\\NSPK\\dataForLoadCopy.xlsx")
 sheet = df.parse(0)
-dbname = 'test'
+dbname = 'data'
 connection = psycopg2.connect(""" dbname = {} user = postgres host = 192.168.47.54 password = Polymedia10""".format(dbname))
 cursor = connection.cursor()
 
