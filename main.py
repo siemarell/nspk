@@ -2,10 +2,8 @@ import sys
 import time
 import logging
 from watchdog.observers import Observer
-from watchdog.events import LoggingEventHandler, FileSystemEventHandler
-from etl.etlprocessor import EtlProcessor
-from etl import etl, config
-from vc_loader import vicube_loader, data_sources
+from watchdog.events import FileSystemEventHandler
+from etl import config
 from worker import DataWorker
 
 import json
@@ -23,17 +21,6 @@ class MyEventHandler(FileSystemEventHandler):
             file = open(path)
             data = json.load(file)
             self.consumer.add_item(data)
-
-
-def update_dwh(data) -> bool:
-    return etl.process_data(data)
-
-
-def update_vicube():
-    v_loader = vicube_loader.DataLoader()
-    v_loader.load_metadata()
-    v_loader.load_data(data_sources.PgSource())
-
 
 if __name__ == "__main__":
     worker = DataWorker()
