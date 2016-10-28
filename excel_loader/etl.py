@@ -55,8 +55,13 @@ for row in sheet.iterrows():
         val_sla = int(val_sla[0])*60 + int(val_sla[1])
 
 
+    if val_sla == 0:
+        val_sla_count = 0
+    else:
+        val_sla_count = 1
 
-    id_client = id.detectid('d_client','full_name',val_client,cursor,connection)
+
+    id_client = id.detectidclient('d_client','full_name',val_client,cursor,connection)
     id_provider = id.detectid('d_provider','name',val_provider,cursor,connection)
     id_rfc = id.detectid('d_rfc','name',val_rfc,cursor,connection)
     id_guilty = id.detectid('d_guilty','name',val_guilty,cursor,connection)
@@ -66,7 +71,7 @@ for row in sheet.iterrows():
 
     cursor.execute(''' INSERT INTO public."f_channel_connect"(id, "id_date_start", "id_date_end", "id_client",
                        "id_provider", "id_rfc", "id_guilty", fact_timedelta,
-                       "fact_sla", "id_time_start", "id_time_end") VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);''',(
+                       "fact_sla", "id_time_start", "id_time_end","event_start_id","sla_count") VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);''',(
         id_fact,
         val_date_start,
         val_date_close,
@@ -78,6 +83,8 @@ for row in sheet.iterrows():
         val_sla,
         val_time_start,
         val_time_close,
+		'0',
+        val_sla_count,
     ))
     connection.commit()
     id_fact+=1

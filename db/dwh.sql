@@ -244,6 +244,7 @@ CREATE TABLE f_channel_connect
   id_guilty integer,
   fact_timedelta integer,
   fact_sla integer,
+  sla_count integer,
 
   CONSTRAINT pk_fact_id PRIMARY KEY (id),
   CONSTRAINT fk_id_client_d_client FOREIGN KEY (id_client)
