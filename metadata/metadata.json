@@ -31,14 +31,22 @@
                         },
                         {
                             "dimensionId": 3,
-                            "factColumnName": "id_time_start"
+                            "factColumnName": "id_date_end"
                         },
                         {
                             "dimensionId": 4,
-                            "factColumnName": "id_host"
+                            "factColumnName": "id_time_start"
                         },
                         {
                             "dimensionId": 5,
+                            "factColumnName": "id_time_end"
+                        },
+                        {
+                            "dimensionId": 6,
+                            "factColumnName": "id_host"
+                        },
+                        {
+                            "dimensionId": 7,
                             "factColumnName": "id_trigger"
                         }
                     ]
@@ -73,7 +81,34 @@
 
                     ],
                     "dimensionlinks": [
-
+                        {
+                            "dimensionId": 1,
+                            "factColumnName": "id_date_start"
+                        },
+                        {
+                            "dimensionId": 2,
+                            "factColumnName": "id_date_start"
+                        },
+                        {
+                            "dimensionId": 3,
+                            "factColumnName": "id_date_end"
+                        },
+                        {
+                            "dimensionId": 4,
+                            "factColumnName": "id_time_start"
+                        },
+                        {
+                            "dimensionId": 5,
+                            "factColumnName": "id_time_end"
+                        },
+                        {
+                            "dimensionId": 8,
+                            "factColumnName": "id_client"
+                        },
+                        {
+                            "dimensionId": 9,
+                            "factColumnName": "id_provider"
+                        }
                     ]
                 }
             ]
@@ -120,6 +155,34 @@
                 }
             ]
         },{
+            "name": "Календарь2",
+            "databaseName": "MyBase",
+            "tableName": "calendar",
+            "idColumnName": "date",
+            "attributes": [
+                {
+                    "name": "Год",
+                    "columnName": "year"
+                },
+                {
+                    "name": "Полугодие",
+                    "columnName": "halfyear"
+                },
+                {
+                    "name": "Квартал",
+                    "columnName": "quarter"
+                },
+                {
+                    "name": "Месяц",
+                    "columnName": "month",
+                    "orderByColumn": "month_number"
+                },
+                {
+                    "name": "День",
+                    "columnName": "date"
+                }
+            ]
+        },{
             "name": "Время",
             "databaseName": "MyBase",
             "tableName": "d_time",
@@ -127,6 +190,18 @@
             "attributes": [
                 {
                     "name": "Время",
+                    "columnName": "time_text",
+                    "orderBy": "id"
+                }
+            ]
+        },{
+            "name": "Время2",
+            "databaseName": "MyBase",
+            "tableName": "d_time",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Время2",
                     "columnName": "time_text",
                     "orderBy": "id"
                 }
@@ -164,11 +239,42 @@
             "idColumnName": "id",
             "attributes": [
                 {
-                    "name": "Имя",
-                    "columnName": "name"
-                },{
                     "name": "Подсистема",
                     "columnName": "source_name"
+                }
+            ]
+        },{
+            "name": "Клиенты",
+            "databaseName": "MyBase",
+            "tableName": "d_client",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Полное имя",
+                    "columnName": "full_name"
+                },{
+                    "name": "Организация",
+                    "columnName": "org_name"
+                },{
+                    "name": "Адрес",
+                    "columnName": "address"
+                },{
+                    "name": "IP",
+                    "columnName": "router_ip"
+                },{
+                    "name": "Провайдер",
+                    "columnName": "provider"
+                }
+            ]
+        },{
+            "name": "Провайдер",
+            "databaseName": "MyBase",
+            "tableName": "d_trigger",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "Имя",
+                    "columnName": "name"
                 }
             ]
         }
