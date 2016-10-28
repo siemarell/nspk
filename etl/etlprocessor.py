@@ -12,10 +12,10 @@ class EtlProcessor:
         self._Session = sessionmaker(bind=self._engine)
         self.session = self._Session()
         
-    def process_server_data(self, json) -> bool:
-        hosts = json['hosts']
-        triggers = json['triggers']
-        fails = json['fails']
+    def process_server_data(self, json: dict) -> bool:
+        hosts = json.get('hosts')
+        triggers = json.get('triggers')
+        fails = json.get('fails')
 
         for fail in fails:
             triggerId = fail['triggerid']
@@ -69,15 +69,15 @@ class EtlProcessor:
             trigger = DTrigger(**kwargs)
         return trigger
 
-    def _get_host(self, hostJson, id) -> DHost:
+    def _get_host(self, hostJson: dict, id) -> DHost:
         kwargs = {
-            "name": hostJson['name'],
-            "purpose": hostJson['role'],
-            "department_owner": hostJson['owner.person'],
-            "subsystem": hostJson['group'],
-            "platform_type": hostJson['type'],
-            "os": hostJson['os'],
-            "administrator": hostJson['owner.person'],
+            "name": hostJson.get('name') or 'НЕ ЗАДАНО!',
+            "purpose": hostJson.get('role') or 'НЕ ЗАДАНО!',
+            "department_owner": hostJson.get('owner.person') or 'НЕ ЗАДАНО!',
+            "subsystem": hostJson.get('group') or 'НЕ ЗАДАНО!',
+            "platform_type": hostJson.get('type') or 'НЕ ЗАДАНО!',
+            "os": hostJson.get('os') or 'НЕ ЗАДАНО!',
+            "administrator": hostJson.get('owner.person') or 'НЕ ЗАДАНО!',
             "external_id": id
         }
         host = self.session.query(DHost).filter(DHost.external_id == id).one_or_none()
@@ -89,10 +89,10 @@ class EtlProcessor:
             host = DHost(**kwargs)
         return host
 
-    def process_channel_data(self, json) -> bool:
-        clients = json['hosts']
-        triggers = json['triggers']
-        fails = json['fails']
+    def process_channel_data(self, json: dict) -> bool:
+        clients = json.get('hosts')
+        triggers = json.get('triggers')
+        fails = json.get('fails')
 
         for fail in fails:
             triggerId = fail['triggerid']
@@ -136,13 +136,13 @@ class EtlProcessor:
             self.session.rollback()
             return False
 
-    def _get_client(self, clientJson, id) -> DClient:
+    def _get_client(self, clientJson: dict, id) -> DClient:
         kwargs = {
-            "full_name": clientJson['name'],
-            "org_name": clientJson['org'],
-            "address": clientJson['addr'],
-            "router_ip": clientJson['routerip'],
-            "provider": clientJson['prov'],
+            "full_name": clientJson.get('name') or 'НЕ ЗАДАНО!',
+            "org_name": clientJson.get('org') or 'НЕ ЗАДАНО!',
+            "address": clientJson.get('addr') or 'НЕ ЗАДАНО!',
+            "router_ip": clientJson.get('routerip') or 'НЕ ЗАДАНО!',
+            "provider": clientJson.get('prov') or 'НЕ ЗАДАНО!',
             "external_id": id
         }
         client = self.session.query(DClient).filter(DClient.external_id == id).one_or_none()
