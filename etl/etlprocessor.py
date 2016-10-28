@@ -55,9 +55,9 @@ class EtlProcessor:
             self.session.rollback()
             return False
 
-    def _get_trigger(self, triggerJson, id) -> DTrigger:
+    def _get_trigger(self, triggerJson: dict, id) -> DTrigger:
         kwargs = {
-            "source_name": ','.join(triggerJson['subsys']),
+            "source_name": ','.join(triggerJson.get('subsys')),
             "external_id": id
         }
         trigger = self.session.query(DTrigger).filter(DTrigger.external_id == id).one_or_none()
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     loader = EtlProcessor()
     file1 = open('../test_data/report001.json')
     json1 = json.load(file1)
-    loader.process_server_data(json1)
-    #file2 = open('../test_data/ak.json')
-    #json2 = json.load(file2)
-    #loader.process_channel_data(json2)
+    print(loader.process_server_data(json1))
+    file2 = open('../test_data/ak.json')
+    json2 = json.load(file2)
+    print(loader.process_channel_data(json2))
