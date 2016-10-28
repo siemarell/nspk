@@ -87,7 +87,7 @@ class DataLoader:
 
                 assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
 
-                print('%d rows inserted into %s' % (count, table))
+                #print('%d rows inserted into %s' % (count, table))
                 rows = []
 
     def _drop_database(self, database):
@@ -96,11 +96,11 @@ class DataLoader:
         path = build_path('/databases/%s', database)
         response = requests.delete(url=path, headers=self.headers)
 
-        if response.status_code == 200:
-            print('Successfully dropped database "%s"' % database)
-        else:
-            args = (database, response.status_code, response.text)
-            print('Cannot drop database %s: (%d) %s' % args)
+        # if response.status_code == 200:
+        #     print('Successfully dropped database "%s"' % database)
+        # else:
+        #     args = (database, response.status_code, response.text)
+        #     print('Cannot drop database %s: (%d) %s' % args)
 
     def _create_database(self, database):
         print('Create database "%s"' % database)
@@ -110,7 +110,7 @@ class DataLoader:
 
         assert response.status_code == 200, 'Cannot create database "%s": %s' % (database, response.text)
 
-        print('Database "%s" successfully created' % database)
+        #print('Database "%s" successfully created' % database)
 
     def _create_table(self, database, body):
         print('Create table "%s"' % body['name'])
@@ -136,10 +136,10 @@ class DataLoader:
         path = build_path('/metadata/cubes')
         response = requests.delete(url=path, headers=self.headers)
 
-        if response.status_code == 200:
-            print('Successfully dropped cubes')
-        else:
-            print('Cannot drop cubes')
+        # if response.status_code == 200:
+        #     print('Successfully dropped cubes')
+        # else:
+        #     print('Cannot drop cubes')
 
     def _drop_dimension(self):
         print('Drop dimensions')
@@ -153,13 +153,13 @@ class DataLoader:
             print('Cannot drop dimensions')
 
     def __create_entity(self, entity, name, path, body):
-        print('Create %s "%s"' % (entity, name))
+        # print('Create %s "%s"' % (entity, name))
 
         response = requests.post(url=path, headers=self.headers, json=body)
 
         assert response.status_code == 200, 'Cannot create %s "%s": %s' % (entity, name, response.text)
 
-        print('%s "%s" successfully created' % (entity.title(), name))
+        # print('%s "%s" successfully created' % (entity.title(), name))
 
     def _create_cube(self, body):
         data = extract(body, ('name', 'databaseName'))
