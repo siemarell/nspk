@@ -1,5 +1,5 @@
 import psycopg2
-import etl.config
+from . import config
 from db.db import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,7 +8,7 @@ import json
 
 class EtlProcessor:
     def __init__(self):
-        self._engine = create_engine(etl.config.conn_string)
+        self._engine = create_engine(config.conn_string)
         self._Session = sessionmaker(bind=self._engine)
         self.session = self._Session()
         
@@ -118,7 +118,8 @@ class EtlProcessor:
                 "id_rfc": 0,
                 "id_guilty": 0,
                 "fact_timedelta": timedelta,
-                "fact_sla": sla
+                "fact_sla": sla,
+                "fact_sla_count": 0 if sla==0 else 1
             }
             dbFail = self.session.query(FChannelConnect).filter(FChannelConnect.event_start_id == int(failId)).one_or_none()
             if dbFail:

@@ -1,4 +1,4 @@
-from etl.etlprocessor import EtlProcessor
+from .etlprocessor import EtlProcessor
 import json
 
 def process_data(json)->bool:
