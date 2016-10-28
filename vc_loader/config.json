@@ -18,6 +18,7 @@
       "d_client",
       "f_channel_connect"
     ]
-  }
+  },
+  "snapshot_path": "nspk.snapshot"
 
 }

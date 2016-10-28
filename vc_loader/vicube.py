@@ -17,7 +17,7 @@ def build_path(route, *args):
     return config.host + route
 
 
-class DataLoader:
+class ViCube:
     def __init__(self):
         self.headers = {
             'Content-Type': 'application/json',
@@ -30,6 +30,15 @@ class DataLoader:
         self.create_link_counter = 0
         self.create_dimension_counter = 0
 
+    def save_snapshot(self):
+        path = build_path('/snapshots')
+        response = requests.post(url=path, headers=config.headers, json={'values': config.snapshot_path})
+        assert response.status_code == 200, 'Cannot save snapshot'
+
+    def load_snapshot(self):
+        path = build_path('/snapshots')
+        response = requests.put(url=path, headers=config.headers, json={'values': config.snapshot_path})
+        assert response.status_code == 200, 'Cannot load snapshot'
 
     def load_metadata(self):
         with open('metadata/metadata.json', encoding='utf-8') as file:

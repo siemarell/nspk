@@ -145,7 +145,7 @@
                 },
                 {
                     "name": "День",
-                    "columnName": "date"
+                    "columnName": "day"
                 }
             ]
         },{

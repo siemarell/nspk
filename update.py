@@ -1,15 +1,18 @@
 from etl import etl, config
-from vc_loader import vicube_loader, data_sources
+from vc_loader.vicube import ViCube
+from vc_loader.data_sources import PgSource
 
 
-def update_vicube()->bool:
-    v_loader = vicube_loader.DataLoader()
+def update_vicube() -> bool:
+    vicube = ViCube()
     try:
-        v_loader.load_metadata()
-        v_loader.load_data(data_sources.PgSource())
+        vicube.load_metadata()
+        vicube.load_data(PgSource())
+        vicube.save_snapshot()
         return True
     except Exception as e:
         print(e)
+        vicube.load_snapshot()
         return False
 
 
