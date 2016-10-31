@@ -65,8 +65,8 @@
                             "aggregator": "SUM"
                         },                        {
                             "name": "Количество инцидентов  SLA",
-                            "columnName": "fact_sla",
-                            "aggregator": "COUNT"
+                            "columnName": "fact_sla_count",
+                            "aggregator": "SUM"
                         },{
                             "name": "Длительность инцидентов  SLA",
                             "columnName": "fact_sla",
