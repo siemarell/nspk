@@ -6,6 +6,7 @@ from update import *
 class DataWorker(Thread):
     def __init__(self):
         super().__init__()
+        self.name = 'Worker'
         self.queue = Queue(maxsize=5)
 
     def add_item(self,item):
