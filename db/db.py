@@ -105,6 +105,7 @@ class FChannelConnect(Base):
     id_guilty = Column(Integer, index=True)
     fact_timedelta = Column(Integer)
     fact_sla = Column(Integer)
+    fact_sla_count = Column(Integer)
 
     d_client = relationship('DClient')
     calendar = relationship('Calendar', primaryjoin='FChannelConnect.id_date_end == Calendar.date')
