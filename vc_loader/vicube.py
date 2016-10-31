@@ -5,7 +5,7 @@ from urllib.parse import quote
 import requests
 
 from vc_loader.config import config
-from vc_loader.data_sources import CsvSource
+from vc_loader.data_sources import CsvSource, PgSource
 
 
 def extract(d, keys):
@@ -32,13 +32,15 @@ class ViCube:
 
     def save_snapshot(self):
         path = build_path('/snapshots')
-        response = requests.post(url=path, headers=config.headers, json={'values': config.snapshot_path})
-        assert response.status_code == 200, 'Cannot save snapshot'
+        response = requests.post(url=path, headers=self.headers, json={'path': config.snapshot_path})
+        assert response.status_code == 200, 'Cannot save snapshot %s' % response.text
+        print('Snapshot %s successfully saved' % config.snapshot_path)
 
     def load_snapshot(self):
         path = build_path('/snapshots')
-        response = requests.put(url=path, headers=config.headers, json={'values': config.snapshot_path})
-        assert response.status_code == 200, 'Cannot load snapshot'
+        response = requests.put(url=path, headers=self.headers, json={'path': config.snapshot_path})
+        assert response.status_code == 200, 'Cannot load snapshot: %s' % response.text
+        print('Snapshot %s successfully loaded' % config.snapshot_path)
 
     def load_metadata(self):
         with open('metadata/metadata.json', encoding='utf-8') as file:
@@ -78,7 +80,7 @@ class ViCube:
             run = True
             count = 0
 
-            path = build_path('/databases/%s/tables/%s/records', database, table)
+            #path = build_path('/databases/%s/tables/%s/records', database, table)
             data_iterator = source.get_data_iterator(table)
 
             print('Load data into table "%s"' % table)
@@ -92,12 +94,14 @@ class ViCube:
                         run = False
                         break
 
-                response = requests.post(url=path, headers=self.headers, json={'values': rows})
+                self._insert_rows(table, rows )
+                #response = requests.post(url=path, headers=self.headers, json={'values': rows})
 
-                assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
+                #assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
 
                 #print('%d rows inserted into %s' % (count, table))
                 rows = []
+            print('Data for "%s" successfully loaded' % table)
 
     def _drop_database(self, database):
         print('Drop database "%s"' % database)
@@ -133,7 +137,7 @@ class ViCube:
 
     def _insert_rows(self, table, dataset):
         path = build_path('/databases/%s/tables/%s/records', config.database, table)
-        response = requests.post(url=path, headers=config.headers, json={'values': dataset})
+        response = requests.post(url=path, headers=self.headers, json={'values': dataset})
         assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
         # print('%d rows inserted into %s' % (reader.line_num, table))
 
@@ -230,10 +234,7 @@ class ViCube:
 
 
 if __name__ == '__main__':
-    csvSource = CsvSource()
-    print(sorted(csvSource.get_tables()))
-    print(csvSource.get_schema(csvSource.get_tables()[2]))
-    print(next(csvSource.get_data_iterator('calendar')))
-    itera = csvSource.get_data_iterator('d_uslugi')
-    while True:
-        print(next(itera))
+    source = PgSource()
+    vc = ViCube()
+    vc.save_snapshot()
+
