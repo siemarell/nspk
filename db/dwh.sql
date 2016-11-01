@@ -169,6 +169,7 @@ CREATE TABLE d_host
   name character varying,
   purpose text,
   department_owner text,
+  name_owner text,
   subsystem text,
   platform_type text,
   os text,

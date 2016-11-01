@@ -74,6 +74,7 @@ class EtlProcessor:
             "name": hostJson.get('name') or 'НЕ ЗАДАНО!',
             "purpose": hostJson.get('role') or 'НЕ ЗАДАНО!',
             "department_owner": hostJson.get('owner.dep') or 'НЕ ЗАДАНО!',
+            "name_owner": "%s (%s)" % (hostJson.get('name') or 'НЕ ЗАДАНО!', hostJson.get('owner.dep') or 'НЕ ЗАДАНО!'),
             "subsystem": hostJson.get('subsys') or 'НЕ ЗАДАНО!',
             "platform_type": hostJson.get('type') or 'НЕ ЗАДАНО!',
             "os": hostJson.get('os') or 'НЕ ЗАДАНО!',

@@ -211,6 +211,9 @@
                     "name": "Имя",
                     "columnName": "name"
                 },{
+                    "name": "Имя и владелец",
+                    "columnName": "name_owner"
+                },{
                     "name": "Назначение",
                     "columnName": "purpose"
                 },{

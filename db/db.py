@@ -49,6 +49,7 @@ class DHost(Base):
     name = Column(String)
     purpose = Column(Text)
     department_owner = Column(Text)
+    name_owner = Column(Text)
     subsystem = Column(Text)
     platform_type = Column(Text)
     os = Column(Text)
