@@ -1,6 +1,7 @@
 from etl import etl, config
 from vc_loader.vicube import ViCube
 from vc_loader.data_sources import PgSource
+import json
 
 
 def update_vicube() -> bool:
@@ -22,5 +23,9 @@ def update_dwh(data) -> bool:
 
 if __name__ == '__main__':
     update_vicube()
-
-    #update_dwh()
+    # file1 = open('/home/siem/PycharmProjects/nspk/data/ak_events_20161015000000_20161028135045.json')
+    # file2 = open('/home/siem/PycharmProjects/nspk/data/infra_events_20161015000000_20161028135209.json')
+    # data1 = json.load(file1)
+    # data2 = json.load(file2)
+    # update_dwh(data1)
+    # update_dwh(data2)

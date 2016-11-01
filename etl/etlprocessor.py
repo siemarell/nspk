@@ -105,7 +105,7 @@ class EtlProcessor:
             dtime_start = datetime.datetime.fromtimestamp(int(fail['period'][0]))
             dtime_end = datetime.datetime.fromtimestamp(int(fail['period'][1]))
             timedelta = (dtime_end - dtime_start).seconds
-            sla = timedelta if timedelta > 3600 *4 else 0
+            sla = 1 if timedelta > 3600 * 4 else 0
 
             kwargs = {
                 "d_client": client,
@@ -117,9 +117,8 @@ class EtlProcessor:
                 "id_time_end": tm(dtime_end.time()),
                 "id_rfc": 0,
                 "id_guilty": 0,
-                "fact_timedelta": timedelta,
-                "fact_sla": sla,
-                "fact_sla_count": 0 if sla==0 else 1
+                "id_sla": sla + 1,
+                "fact_timedelta": timedelta
             }
             dbFail = self.session.query(FChannelConnect).filter(FChannelConnect.event_start_id == int(failId)).one_or_none()
             if dbFail:

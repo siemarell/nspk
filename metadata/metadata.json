@@ -63,16 +63,7 @@
                             "name": "Длительность инцидентов каналов",
                             "columnName": "fact_timedelta",
                             "aggregator": "SUM"
-                        },                        {
-                            "name": "Количество инцидентов  SLA",
-                            "columnName": "fact_sla_count",
-                            "aggregator": "SUM"
-                        },{
-                            "name": "Длительность инцидентов  SLA",
-                            "columnName": "fact_sla",
-                            "aggregator": "SUM"
                         }
-
                     ],
                     "dimensionlinks": [
                         {
@@ -102,6 +93,10 @@
                         {
                             "dimensionId": 9,
                             "factColumnName": "id_provider"
+                        },
+                        {
+                            "dimensionId": 10,
+                            "factColumnName": "id_sla"
                         }
                     ]
                 }
@@ -274,6 +269,17 @@
             "attributes": [
                 {
                     "name": "Имя",
+                    "columnName": "name"
+                }
+            ]
+        },{
+            "name": "SLA",
+            "databaseName": "MyBase",
+            "tableName": "d_sla",
+            "idColumnName": "id",
+            "attributes": [
+                {
+                    "name": "SLA",
                     "columnName": "name"
                 }
             ]

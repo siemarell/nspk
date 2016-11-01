@@ -70,6 +70,13 @@ class DRfc(Base):
     name = Column(Text)
 
 
+class DSla(Base):
+    __tablename__ = 'd_sla'
+
+    id = Column(Integer, primary_key=True, server_default=text("nextval('d_sla_id_seq'::regclass)"))
+    name = Column(String)
+
+
 class DTime(Base):
     __tablename__ = 'd_time'
 
@@ -103,14 +110,14 @@ class FChannelConnect(Base):
     id_provider = Column(ForeignKey('d_provider.id'), index=True)
     id_rfc = Column(Integer, index=True)
     id_guilty = Column(Integer, index=True)
+    id_sla = Column(ForeignKey('d_sla.id'))
     fact_timedelta = Column(Integer)
-    fact_sla = Column(Integer)
-    fact_sla_count = Column(Integer)
 
     d_client = relationship('DClient')
     calendar = relationship('Calendar', primaryjoin='FChannelConnect.id_date_end == Calendar.date')
     calendar1 = relationship('Calendar', primaryjoin='FChannelConnect.id_date_start == Calendar.date')
     d_provider = relationship('DProvider')
+    d_sla = relationship('DSla')
     d_time = relationship('DTime', primaryjoin='FChannelConnect.id_time_end == DTime.id')
     d_time1 = relationship('DTime', primaryjoin='FChannelConnect.id_time_start == DTime.id')
 

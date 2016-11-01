@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS d_division_owner CASCADE;
 DROP TABLE IF EXISTS d_guilty CASCADE;
 DROP TABLE IF EXISTS d_host CASCADE;
 DROP TABLE IF EXISTS d_os CASCADE;
+DROP TABLE IF EXISTS d_sla CASCADE;
 DROP TABLE IF EXISTS d_period_type CASCADE;
 DROP TABLE IF EXISTS d_platform_type CASCADE;
 DROP TABLE IF EXISTS d_provider CASCADE;
@@ -226,6 +227,25 @@ WITH (
 );
 ALTER TABLE d_trigger
   OWNER TO postgres;
+
+-- Table: d_trigger
+
+-- DROP TABLE d_trigger;
+
+CREATE TABLE d_sla
+(
+  id serial NOT NULL,
+  name character varying,
+  CONSTRAINT d_sla_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE d_trigger
+  OWNER TO postgres;
+INSERT INTO d_sla(id,name)
+    VALUES (1, 'Без превышения SLA'),
+      (2, 'С превышением SLA');
 -- Table: f_channel_connect
 
 -- DROP TABLE f_channel_connect;
@@ -242,13 +262,14 @@ CREATE TABLE f_channel_connect
   id_provider integer,
   id_rfc integer,
   id_guilty integer,
+  id_sla integer,
   fact_timedelta integer,
-  fact_sla integer,
-  fact_sla_count integer,
-
   CONSTRAINT pk_fact_id PRIMARY KEY (id),
   CONSTRAINT fk_id_client_d_client FOREIGN KEY (id_client)
       REFERENCES d_client (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_id_sla_d_sla FOREIGN KEY (id_sla)
+      REFERENCES d_sla (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_id_date_end_calendar FOREIGN KEY (id_date_end)
       REFERENCES calendar (date) MATCH SIMPLE
