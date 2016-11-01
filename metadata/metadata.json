@@ -214,6 +214,9 @@
                     "name": "Назначение",
                     "columnName": "purpose"
                 },{
+                    "name": "Подсистема",
+                    "columnName": "subsystem"
+                },{
                     "name": "Подразделение-владелец",
                     "columnName": "department_owner"
                 },{
