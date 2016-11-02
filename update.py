@@ -18,7 +18,13 @@ def update_vicube() -> bool:
 
 
 def update_dwh(data) -> bool:
-    return etl.process_data(data)
+    try:
+        result = etl.process_data(data)
+        return result
+    except Exception as e:
+        print(e)
+        return False
+
 
 
 if __name__ == '__main__':
