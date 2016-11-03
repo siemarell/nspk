@@ -7,7 +7,7 @@ class DataWorker(Thread):
     def __init__(self):
         super().__init__()
         self.name = 'Worker'
-        self.queue = Queue(maxsize=5)
+        self.queue = Queue(maxsize=10)
 
     def add_item(self,item):
         self.queue.put(item)
@@ -17,7 +17,7 @@ class DataWorker(Thread):
         while True:
             if not self.queue.empty():
                 data = self.queue.get()
-                print('Trying to update dwh')
+                print('Trying to update dwh with: ' + data['name'])
                 if update_dwh(data):
                     print('Success')
                     data_changed=True
@@ -28,6 +28,6 @@ class DataWorker(Thread):
                         print('Success')
                     else: print('Failure')
                     data_changed = False
-            time.sleep(10)
+            time.sleep(2)
 
 

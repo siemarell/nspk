@@ -15,14 +15,16 @@ class MyEventHandler(FileSystemEventHandler):
         self.consumer = consumer
 
     def on_created(self, event):
-        print(event.src_path)
+        print('New file: ' + event.src_path)
         path = event.src_path
         if path.endswith('.json'):
             file = open(path)
             data = json.load(file)
+            data['name'] = path
             self.consumer.add_item(data)
 
 if __name__ == "__main__":
+    print('Proccess started')
     worker = DataWorker()
     worker.setDaemon(True)
     worker.start()
@@ -32,6 +34,7 @@ if __name__ == "__main__":
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
 
+    print('Entered main even loop')
     try:
         while True:
             time.sleep(1)
