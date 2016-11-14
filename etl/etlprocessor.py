@@ -5,6 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import datetime
 import json
+import log
+logger = log.getMyLogger(__name__)
 
 class EtlProcessor:
     def __init__(self):
@@ -51,7 +53,7 @@ class EtlProcessor:
             self.session.commit()
             return True
         except Exception as e:
-            print(e)
+            logger.error(e)
             self.session.rollback()
             return False
 
@@ -133,7 +135,7 @@ class EtlProcessor:
             self.session.commit()
             return True
         except Exception as e:
-            print(e)
+            logger.error(e)
             self.session.rollback()
             return False
 
@@ -170,7 +172,7 @@ if __name__ == '__main__':
     loader = EtlProcessor()
     file1 = open('../test_data/report001.json')
     json1 = json.load(file1)
-    print(loader.process_server_data(json1))
+    logger.error(loader.process_server_data(json1))
     file2 = open('../test_data/ak.json')
     json2 = json.load(file2)
-    print(loader.process_channel_data(json2))
+    logger.error(loader.process_channel_data(json2))

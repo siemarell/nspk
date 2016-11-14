@@ -6,6 +6,8 @@ import requests
 
 from vc_loader.config import config
 from vc_loader.data_sources import CsvSource, PgSource
+import log
+logger = log.getMyLogger(__name__)
 
 
 def extract(d, keys):
@@ -34,13 +36,13 @@ class ViCube:
         path = build_path('/snapshots')
         response = requests.post(url=path, headers=self.headers, json={'path': config.snapshot_path})
         assert response.status_code == 200, 'Cannot save snapshot %s' % response.text
-        print('Snapshot %s successfully saved' % config.snapshot_path)
+        logger.info('Snapshot %s successfully saved' % config.snapshot_path)
 
     def load_snapshot(self):
         path = build_path('/snapshots')
         response = requests.put(url=path, headers=self.headers, json={'path': config.snapshot_path})
         assert response.status_code == 200, 'Cannot load snapshot: %s' % response.text
-        print('Snapshot %s successfully loaded' % config.snapshot_path)
+        logger.info('Snapshot %s successfully loaded' % config.snapshot_path)
 
     def load_metadata(self):
         with open('metadata/metadata.json', encoding='utf-8') as file:
@@ -83,7 +85,7 @@ class ViCube:
             #path = build_path('/databases/%s/tables/%s/records', database, table)
             data_iterator = source.get_data_iterator(table)
 
-            print('Load data into table "%s"' % table)
+            logger.info('Load data into table "%s"' % table)
             while run:
                 for i in range(config.bulk_size):
                     try:
@@ -99,80 +101,80 @@ class ViCube:
 
                 #assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
 
-                #print('%d rows inserted into %s' % (count, table))
+                #logger.info('%d rows inserted into %s' % (count, table))
                 rows = []
-            print('Data for "%s" successfully loaded' % table)
+            logger.info('Data for "%s" successfully loaded' % table)
 
     def _drop_database(self, database):
-        print('Drop database "%s"' % database)
+        logger.info('Drop database "%s"' % database)
 
         path = build_path('/databases/%s', database)
         response = requests.delete(url=path, headers=self.headers)
 
         # if response.status_code == 200:
-        #     print('Successfully dropped database "%s"' % database)
+        #     logger.info('Successfully dropped database "%s"' % database)
         # else:
         #     args = (database, response.status_code, response.text)
-        #     print('Cannot drop database %s: (%d) %s' % args)
+        #     logger.info('Cannot drop database %s: (%d) %s' % args)
 
     def _create_database(self, database):
-        print('Create database "%s"' % database)
+        logger.info('Create database "%s"' % database)
 
         path = build_path('/databases')
         response = requests.post(url=path, headers=self.headers, json={"name": database})
 
         assert response.status_code == 200, 'Cannot create database "%s": %s' % (database, response.text)
 
-        #print('Database "%s" successfully created' % database)
+        #logger.info('Database "%s" successfully created' % database)
 
     def _create_table(self, database, body):
-        print('Create table "%s"' % body['name'])
+        logger.info('Create table "%s"' % body['name'])
 
         path = build_path('/databases/%s/tables', database)
         response = requests.post(url=path, headers=self.headers, json=body)
 
         assert response.status_code == 200, 'Cannot create table "%s": %s' % (body['name'], response.text)
 
-        print('Table "%s" successfully created' % body['name'])
+        logger.info('Table "%s" successfully created' % body['name'])
 
     def _insert_rows(self, table, dataset):
         path = build_path('/databases/%s/tables/%s/records', config.database, table)
         response = requests.post(url=path, headers=self.headers, json={'values': dataset})
         assert response.status_code == 200, 'Cannot insert values into table %s: %s' % (table, response.text)
-        # print('%d rows inserted into %s' % (reader.line_num, table))
+        # logger.info('%d rows inserted into %s' % (reader.line_num, table))
 
     def _drop_cubes(self):
         self.create_cube_counter = 0
         self.create_measure_group_counter = 0
-        print('Drop cubes')
+        logger.info('Drop cubes')
 
         path = build_path('/metadata/cubes')
         response = requests.delete(url=path, headers=self.headers)
 
         # if response.status_code == 200:
-        #     print('Successfully dropped cubes')
+        #     logger.info('Successfully dropped cubes')
         # else:
-        #     print('Cannot drop cubes')
+        #     logger.info('Cannot drop cubes')
 
     def _drop_dimension(self):
-        print('Drop dimensions')
+        logger.info('Drop dimensions')
 
         path = build_path('/metadata/dimensions')
         response = requests.delete(url=path, headers=self.headers)
 
         if response.status_code == 200:
-            print('Successfully dropped dimensions')
+            logger.info('Successfully dropped dimensions')
         else:
-            print('Cannot drop dimensions')
+            logger.info('Cannot drop dimensions')
 
     def __create_entity(self, entity, name, path, body):
-        # print('Create %s "%s"' % (entity, name))
+        # logger.info('Create %s "%s"' % (entity, name))
 
         response = requests.post(url=path, headers=self.headers, json=body)
 
         assert response.status_code == 200, 'Cannot create %s "%s": %s' % (entity, name, response.text)
 
-        # print('%s "%s" successfully created' % (entity.title(), name))
+        # logger.info('%s "%s" successfully created' % (entity.title(), name))
 
     def _create_cube(self, body):
         data = extract(body, ('name', 'databaseName'))

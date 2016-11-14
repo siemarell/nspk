@@ -5,6 +5,8 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from etl import config
 from worker import DataWorker
+import log
+logger = log.getMyLogger(__name__)
 
 import json
 
@@ -15,7 +17,7 @@ class MyEventHandler(FileSystemEventHandler):
         self.consumer = consumer
 
     def on_created(self, event):
-        print('New file: ' + event.src_path)
+        logger.info('New file: ' + event.src_path)
         path = event.src_path
         if path.endswith('.json'):
             file = open(path)
@@ -24,7 +26,7 @@ class MyEventHandler(FileSystemEventHandler):
             self.consumer.add_item(data)
 
 if __name__ == "__main__":
-    print('Proccess started')
+    logger.info('Proccess started')
     worker = DataWorker()
     worker.setDaemon(True)
     worker.start()
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
 
-    print('Entered main even loop')
+    logger.info('Entered main even loop')
     try:
         while True:
             time.sleep(1)
@@ -48,5 +50,5 @@ if __name__ == "__main__":
 #     # if etl.process_data(data):
 #     #     update_vicube()
 #     # else:
-#     #     print('etl error')
+#     #     logger.info('etl error')
 #     update_vicube()

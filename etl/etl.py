@@ -1,12 +1,14 @@
 from .etlprocessor import EtlProcessor
 import json
+import log
+logger = log.getMyLogger(__name__)
 
 def process_data(json)->bool:
     etl_processor = EtlProcessor()
     type = _get_data_type(json)
     if type == 'chan': return etl_processor.process_channel_data(json)
     if type == 'serv': return etl_processor.process_server_data(json)
-    print('Wrong json')
+    logger.info('Wrong json')
     return False
 
 
@@ -18,7 +20,7 @@ def _get_data_type(json)->bool:
         if 'os' in host.keys(): return 'serv'
         return None
     except Exception as e:
-        print(e)
+        logger.error('FAILED TO GET DATA TYPE')
         return None
 
 if __name__ == '__main__':

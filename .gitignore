@@ -7,3 +7,4 @@ test_data/
 /etl/config.py
 /vc_loader/config.json
 data/
+log.log
